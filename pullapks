@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]
+  then 
+    DIR='.'
+  else
+    DIR=$1
+    mkdir -p $1
+fi
+
+echo "Saving to $DIR"
+
+for i in $(adb shell pm list packages | awk -F':' '{print $2}'); 
+
+  do
+    apkPATH="$(adb shell pm path $i)"
+    echo "Converting $i -> $apkPATH";
+    adb pull "$(echo $apkPATH | awk -F':' '{print $2}')"; 
+    #if name was base.apk then rename it to package.name.apk
+    if [ -f "base.apk" ]; then
+      mv base.apk $DIR/$i.apk;
+    fi
+
+  done
